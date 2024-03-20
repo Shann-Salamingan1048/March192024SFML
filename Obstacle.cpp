@@ -13,10 +13,20 @@ void Obstacle::initObstacles()
 	{
 		this->Obstacles.push_back(this->ObstacleShape);
 		// Set the position of the obstacle
-		this->Obstacles[i].setPosition((i + 1) * this->Obstacles[i].getSize().x, (i + 1) * this->Obstacles[i].getSize().y); // x, y
+		this->Obstacles[i].setPosition((i + 2) * this->Obstacles[i].getSize().x, (i + 2) * this->Obstacles[i].getSize().y); // x, y
 	}
 }
 Obstacle ::Obstacle()
 {
 	this->initObstacles();
+}
+Obstacle :: ~Obstacle() { std::cout << "Obstacle Destructor\n"; };
+void Obstacle::renderObstacles(sf::RenderWindow& window)
+{
+	for (const auto& i : Obstacles)
+		window.draw(i);
+}
+sf::FloatRect Obstacle::getGlobBound(const sf::RectangleShape& obtacle) const
+{
+	return obtacle.getGlobalBounds();
 }

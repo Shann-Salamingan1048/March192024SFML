@@ -7,6 +7,7 @@
 #include <iostream>
 #include <memory>
 #include "Player.h"
+#include "Obstacle.h"
 class Game
 {
 private:
@@ -14,7 +15,9 @@ private:
 	sf::Event event;
 	sf::VideoMode videoMode;
 	Player player1;
+	Obstacle obstacle;
 	void initWindow();
+	const bool isCollisionX() const;
 public:
 	Game();
 	~Game();

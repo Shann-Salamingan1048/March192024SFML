@@ -25,3 +25,11 @@ void Player::movePlayer(const sf::Vector2f& PlayerMovement)
 {
 	this->player1.move(PlayerMovement);
 }
+sf::Vector2f Player::getPos()
+{
+	return this->player1.getPosition();
+}
+sf::FloatRect Player::getGlobBound() const
+{
+	return this->player1.getGlobalBounds();
+}

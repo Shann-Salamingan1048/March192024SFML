@@ -17,4 +17,6 @@ public:
 	void renderPlayer(sf::RenderWindow& window);
 
 	void movePlayer(const sf::Vector2f& PlayerMovement);
+	sf::FloatRect getGlobBound() const;
+	sf::Vector2f getPos();
 };

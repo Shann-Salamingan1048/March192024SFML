@@ -22,6 +22,7 @@ const bool Game::isRunning() const
 }
 void Game::pollEvents()
 {
+	sf::Vector2f CurrPos = this->player1.getPos();
 	while (this->window->pollEvent(event))  // movements of the player
 	{
 		switch (event.type) 
@@ -30,6 +31,8 @@ void Game::pollEvents()
 			this->window->close();
 			break;
 		case sf::Event::KeyPressed:
+			
+			std::cout << "Player Curr Pos X: " << CurrPos.x << "\nPlayer Curr Pos Y: " << CurrPos.y << "\n";
 			switch (event.key.code)
 			{
 			case sf::Keyboard::A:
@@ -49,12 +52,36 @@ void Game::pollEvents()
 				this->player1.PlayerMovement.x = 0.0f;
 				break;
 			}
-			this->player1.movePlayer(this->player1.PlayerMovement);
+			//this->player1.movePlayer(this->player1.PlayerMovement);
+			if(!isCollisionX())
+				this->player1.movePlayer(this->player1.PlayerMovement);
 			break;
 		default:
 			break;
 		}
 	}
+}
+const bool Game::isCollisionX() const
+{
+	sf::FloatRect PlayerBounds = this->player1.getGlobBound();
+
+	for (const sf::RectangleShape& oneObs : this->obstacle.Obstacles) 
+	{
+		sf::FloatRect obstacleBounds = obstacle.getGlobBound(oneObs);
+		if (PlayerBounds.left + PlayerBounds.width + this->player1.PlayerMovement.x > obstacleBounds.left)
+		{
+
+			return true; // not yet finished
+		}
+		//if (PlayerBounds.left < PlayerBounds.left + obstacleBounds.width &&
+		//	PlayerBounds.left + PlayerBounds.width > obstacleBounds.left)
+		//{
+		//	return true; // Collision detected with this obstacle
+		//}
+	}
+
+	// Check for intersection using the bounds
+	return false;
 }
 void Game::update()
 {
@@ -65,7 +92,7 @@ void Game::render()
 	this->window->clear();
 	// render
 	this->player1.renderPlayer(*this->window);
-
+	this->obstacle.renderObstacles(*this->window);
 
 	this->window->display();
 }
