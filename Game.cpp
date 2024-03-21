@@ -32,7 +32,8 @@ void Game::pollEvents()
 			break;
 		case sf::Event::KeyPressed:
 			
-			std::cout << "Player Curr Pos X: " << CurrPos.x << "\nPlayer Curr Pos Y: " << CurrPos.y << "\n";
+			std::cout << "Player Curr Pos X: " << CurrPos.x << "\n";
+				//"Player Curr Pos Y: " << CurrPos.y << "\n";
 			switch (event.key.code)
 			{
 			case sf::Keyboard::A:
@@ -53,31 +54,45 @@ void Game::pollEvents()
 				break;
 			}
 			//this->player1.movePlayer(this->player1.PlayerMovement);
-			if(!isCollisionX())
+			if (!isCollisionX())
+			{
 				this->player1.movePlayer(this->player1.PlayerMovement);
+			}
+			
+			// kuyang pa ng isCollionY
 			break;
 		default:
 			break;
 		}
 	}
 }
-const bool Game::isCollisionX() const
+ bool Game::isCollisionX() 
 {
-	sf::FloatRect PlayerBounds = this->player1.getGlobBound();
-
+	//sf::FloatRect PlayerBounds = this->player1.getGlobBound();
+	sf::Vector2f PlayerPositions = this->player1.getPos();
+	float Player_Left = PlayerPositions.x;
+	sf::Vector2f PlayerSizes = this->player1.getSize();
+	float Player_Right = PlayerPositions.x + PlayerSizes.x;
+	float Player_Top = PlayerPositions.y;
+	float Player_Bot = PlayerPositions.y + PlayerSizes.y;
 	for (const sf::RectangleShape& oneObs : this->obstacle.Obstacles) 
 	{
-		sf::FloatRect obstacleBounds = obstacle.getGlobBound(oneObs);
-		if (PlayerBounds.left + PlayerBounds.width + this->player1.PlayerMovement.x > obstacleBounds.left)
+		sf::Vector2f ObstaclePos = this->obstacle.getPos(oneObs);
+		sf::Vector2f ObstacleSizes = this->obstacle.getSize(oneObs);
+		float Obs_Left = ObstaclePos.x;
+		float Obs_Right = ObstaclePos.x + ObstacleSizes.x;
+		float Obs_Top = ObstaclePos.y;
+		float Obs_Bot = ObstaclePos.y + ObstacleSizes.y;
+		//sf::FloatRect obstacleBounds = obstacle.getGlobBound(oneObs);
+		if ( (Player_Right + this->player1.PlayerMovement.x > Obs_Left) && (Player_Left + this->player1.PlayerMovement.x < Obs_Right)
+			&& (Player_Bot >=  Obs_Top && Player_Top <= Obs_Bot))
 		{
-
+			this->player1.PlayerMovement.x = (this->player1.PlayerMovement.x + Player_Right) - Obs_Left;
+			std::cout << "Player X Motion: " << this->player1.PlayerMovement.x << "\n";
+			std::cout << "Player Right: " << Player_Right << "\n";
+			std::cout << "Obstacle Left: " << Obs_Left << "\n";
 			return true; // not yet finished
 		}
-		//if (PlayerBounds.left < PlayerBounds.left + obstacleBounds.width &&
-		//	PlayerBounds.left + PlayerBounds.width > obstacleBounds.left)
-		//{
-		//	return true; // Collision detected with this obstacle
-		//}
 	}
 
 	// Check for intersection using the bounds

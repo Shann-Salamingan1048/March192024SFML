@@ -3,7 +3,7 @@
 void Player::initPLayer()
 {
 	// size
-	this->player1.setSize(sf::Vector2f(100.0f, 50.0f));
+	this->player1.setSize(sf::Vector2f(100.0f, 50.0f)); // width , height or x,y
 	// Set the position of the rectangle
 	this->player1.setPosition(50.0f, 50.0f); // x, y
 
@@ -20,14 +20,23 @@ Player :: ~Player() { std::cout << "Player Destructor!\n"; }
 void Player::renderPlayer(sf::RenderWindow& window)
 {
 	window.draw(this->player1);
+	
 }
 void Player::movePlayer(const sf::Vector2f& PlayerMovement)
 {
 	this->player1.move(PlayerMovement);
 }
-sf::Vector2f Player::getPos()
+sf::Vector2f Player::getPos() const
 {
 	return this->player1.getPosition();
+}
+void Player::setPos(const sf::Vector2f& PlayerPos) 
+{
+	this->player1.setPosition(PlayerPos);
+}
+sf::Vector2f Player::getSize() const
+{
+	return this->player1.getSize();
 }
 sf::FloatRect Player::getGlobBound() const
 {

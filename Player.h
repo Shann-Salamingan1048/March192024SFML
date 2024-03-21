@@ -18,5 +18,7 @@ public:
 
 	void movePlayer(const sf::Vector2f& PlayerMovement);
 	sf::FloatRect getGlobBound() const;
-	sf::Vector2f getPos();
+	sf::Vector2f getPos() const;
+	sf::Vector2f getSize() const;
+	void setPos(const sf::Vector2f& PlayerPos);
 };

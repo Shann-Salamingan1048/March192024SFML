@@ -30,3 +30,11 @@ sf::FloatRect Obstacle::getGlobBound(const sf::RectangleShape& obtacle) const
 {
 	return obtacle.getGlobalBounds();
 }
+sf::Vector2f Obstacle::getPos(const sf::RectangleShape& obtacle) const
+{
+	return obtacle.getPosition();
+}
+sf::Vector2f Obstacle::getSize(const sf::RectangleShape& obtacle) const
+{
+	return obtacle.getSize();
+}

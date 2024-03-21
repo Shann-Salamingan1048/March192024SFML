@@ -17,7 +17,7 @@ private:
 	Player player1;
 	Obstacle obstacle;
 	void initWindow();
-	const bool isCollisionX() const;
+	bool isCollisionX();
 public:
 	Game();
 	~Game();
