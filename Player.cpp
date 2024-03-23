@@ -5,6 +5,7 @@ void Player::initPLayer()
 	// size
 	this->player1.setSize(sf::Vector2f(100.0f, 50.0f)); // width , height or x,y
 	// Set the position of the rectangle
+	//this->player1.setOrigin(this->player1.getSize() / 2.0f);
 	this->player1.setPosition(50.0f, 50.0f); // x, y
 
 	// Set the color of the rectangle

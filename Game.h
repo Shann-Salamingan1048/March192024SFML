@@ -18,6 +18,8 @@ private:
 	Obstacle obstacle;
 	void initWindow();
 	bool isCollisionX();
+	bool isCollisionY();
+	float addY;
 public:
 	Game();
 	~Game();

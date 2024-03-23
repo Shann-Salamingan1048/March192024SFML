@@ -4,7 +4,7 @@ void Obstacle::initObstacles()
 {
 	// size
 	this->ObstacleShape.setSize(sf::Vector2f(150.0f, 150.0f));
-
+	//this->ObstacleShape.setOrigin(this->ObstacleShape.getSize() / 2.0f);
 	// Set the color of the rectangle
 	this->ObstacleShape.setFillColor(sf::Color::Blue);
 

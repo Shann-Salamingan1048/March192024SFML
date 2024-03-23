@@ -6,6 +6,7 @@ void Game::initWindow()
 	this->window = std::make_unique<sf::RenderWindow>(this->videoMode, "Simple Game SFML", sf::Style::Titlebar | sf::Style::Close); // smart ptr
 	this->window->setFramerateLimit(60);
 
+	this->addY = 0.0f;
 }
 Game::Game()
 {
@@ -32,7 +33,7 @@ void Game::pollEvents()
 			break;
 		case sf::Event::KeyPressed:
 			
-			std::cout << "Player Curr Pos X: " << CurrPos.x << "\n";
+			std::cout << "Player Move Y: " << this->player1.getPos().y + this->player1.getSize().y << "\n";
 				//"Player Curr Pos Y: " << CurrPos.y << "\n";
 			switch (event.key.code)
 			{
@@ -53,13 +54,15 @@ void Game::pollEvents()
 				this->player1.PlayerMovement.x = 0.0f;
 				break;
 			}
+			this->addY = 0.0f;
 			//this->player1.movePlayer(this->player1.PlayerMovement);
-			if (!isCollisionX())
+			this->player1.movePlayer(this->player1.PlayerMovement);
+			if (!isCollisionY())
 			{
-				this->player1.movePlayer(this->player1.PlayerMovement);
+				CurrPos.y += this->addY;
+				this->player1.setPos(CurrPos);
 			}
-			
-			// kuyang pa ng isCollionY
+
 			break;
 		default:
 			break;
@@ -84,13 +87,9 @@ void Game::pollEvents()
 		float Obs_Top = ObstaclePos.y;
 		float Obs_Bot = ObstaclePos.y + ObstacleSizes.y;
 		//sf::FloatRect obstacleBounds = obstacle.getGlobBound(oneObs);
-		if ( (Player_Right + this->player1.PlayerMovement.x > Obs_Left) && (Player_Left + this->player1.PlayerMovement.x < Obs_Right)
+		if ( (Player_Right > Obs_Left) && (Player_Left  < Obs_Right)
 			&& (Player_Bot >=  Obs_Top && Player_Top <= Obs_Bot))
 		{
-			this->player1.PlayerMovement.x = (this->player1.PlayerMovement.x + Player_Right) - Obs_Left;
-			std::cout << "Player X Motion: " << this->player1.PlayerMovement.x << "\n";
-			std::cout << "Player Right: " << Player_Right << "\n";
-			std::cout << "Obstacle Left: " << Obs_Left << "\n";
 			return true; // not yet finished
 		}
 	}
@@ -98,6 +97,64 @@ void Game::pollEvents()
 	// Check for intersection using the bounds
 	return false;
 }
+ bool Game::isCollisionY()
+ {
+	 //sf::FloatRect PlayerBounds = this->player1.getGlobBound();
+	 sf::Vector2f PlayerPositions = this->player1.getPos();
+	 float Player_Left = PlayerPositions.x;
+	 sf::Vector2f PlayerSizes = this->player1.getSize();
+	 float Player_Right = PlayerPositions.x + PlayerSizes.x;
+	 float Player_Top = PlayerPositions.y;
+	 float Player_Bot = PlayerPositions.y + PlayerSizes.y;
+	 int count = 1;
+	 for (const sf::RectangleShape& oneObs : this->obstacle.Obstacles)
+	 {
+		 sf::Vector2f ObstaclePos = this->obstacle.getPos(oneObs);
+		 sf::Vector2f ObstacleSizes = this->obstacle.getSize(oneObs);
+		 float Obs_Left = ObstaclePos.x;
+		 float Obs_Right = ObstaclePos.x + ObstacleSizes.x;
+		 float Obs_Top = ObstaclePos.y;
+		 float Obs_Bot = ObstaclePos.y + ObstacleSizes.y;
+		 //sf::FloatRect obstacleBounds = obstacle.getGlobBound(oneObs);
+		 if ((Player_Bot  > Obs_Top) && (Player_Top < Obs_Bot)
+			 && (Player_Right >= Obs_Left && Player_Left <= Obs_Right))
+		 {
+			 std::cout << count << " na obstacle\n";
+			 std::cout << "Obs Top: " << Obs_Top << ", Obs Top % 20: " << static_cast<int>(Obs_Top) % 20 << 
+				 ", Player Bot % 20: " << static_cast<int>(Player_Bot) % 20 << "\n";
+			 /*
+			 this if and else if statement is to add 10 or -10 position in y axis of the player. 
+			 example: the player bot is at 440 and the head of the obstacle is 450, the player will not exceed 440
+			 but in this if and else if function it will go 450 and it will not exceed 450, so that it is properly
+			 bump by the logic just like in real life bump in the concrete wall.
+			 this is vice versa to the obstacle bot and player top
+			 |
+			 v <- player bot
+			 --- <- bump (Obstacle head or top )
+			 
+			 ______   <- bump (obstacle bot)
+			 ^ <- player top
+			 |
+			 */
+			 if ((static_cast<int>(Obs_Top) % 20 == 10 && static_cast<int>(Player_Bot) % 20 == 0)
+				 || (static_cast<int>(Obs_Top) % 20 == 0 && static_cast<int>(Player_Bot) % 20 == 10))
+			 {
+				 this->addY = 10.0f;
+			 }
+			 else if ((static_cast<int>(Obs_Bot) % 20 == 10 && static_cast<int>(Player_Top) % 20 == 0)
+				 || (static_cast<int>(Obs_Bot) % 20 == 0 && static_cast<int>(Player_Top) % 20 == 10))
+			 {
+				 this->addY = -10.0f;
+			 }
+			 std::cout << "Add y : " << this->addY << "\n";
+			 return false; // not yet finished
+		 }
+		 count++;
+	 }
+
+	 // Check for intersection using the bounds
+	 return true;
+ }
 void Game::update()
 {
 	this->pollEvents();
