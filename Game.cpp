@@ -7,6 +7,7 @@ void Game::initWindow()
 	this->window->setFramerateLimit(60);
 
 	this->addY = 0.0f;
+	this->addX = 0.0f;
 }
 Game::Game()
 {
@@ -33,7 +34,7 @@ void Game::pollEvents()
 			break;
 		case sf::Event::KeyPressed:
 			
-			std::cout << "Player Move Y: " << this->player1.getPos().y + this->player1.getSize().y << "\n";
+			//std::cout << "Player Move Y: " << this->player1.getPos().x + this->player1.getSize().x << "\n";
 				//"Player Curr Pos Y: " << CurrPos.y << "\n";
 			switch (event.key.code)
 			{
@@ -55,13 +56,21 @@ void Game::pollEvents()
 				break;
 			}
 			this->addY = 0.0f;
+			this->addX = 0.0f;
 			//this->player1.movePlayer(this->player1.PlayerMovement);
 			this->player1.movePlayer(this->player1.PlayerMovement);
-			if (!isCollisionY())
+			std::cout << "Collision Y: " << !isCollisionY() << "\nCollision X: " << !isCollisionX() << "\n";
+			if ((!isCollisionY() && this->player1.PlayerMovement.y != 0) || (!isCollisionX() && this->player1.PlayerMovement.x != 0))
 			{
 				CurrPos.y += this->addY;
+				CurrPos.x += this->addX;
 				this->player1.setPos(CurrPos);
 			}
+			// else if (!isCollisionX() && this->player1.PlayerMovement.x != 0) // experiment ra ini pag comment
+			//{
+			//	CurrPos.x += this->addX;
+			//	this->player1.setPos(CurrPos);
+			//}
 
 			break;
 		default:
@@ -87,15 +96,34 @@ void Game::pollEvents()
 		float Obs_Top = ObstaclePos.y;
 		float Obs_Bot = ObstaclePos.y + ObstacleSizes.y;
 		//sf::FloatRect obstacleBounds = obstacle.getGlobBound(oneObs);
-		if ( (Player_Right > Obs_Left) && (Player_Left  < Obs_Right)
-			&& (Player_Bot >=  Obs_Top && Player_Top <= Obs_Bot))
+		if ((Player_Right > Obs_Left) && (Player_Left < Obs_Right)
+			&& (Player_Bot >= Obs_Top && Player_Top <= Obs_Bot))
 		{
-			return true; // not yet finished
+			if ((static_cast<int>(Obs_Left) % 20 == 10 && static_cast<int>(Player_Right) % 20 == 0)
+				|| (static_cast<int>(Obs_Left) % 20 == 0 && static_cast<int>(Player_Right) % 20 == 10))
+			{
+				this->addX = 10.0f;
+			}
+			else if ((static_cast<int>(Obs_Right) % 20 == 10 && static_cast<int>(Player_Left) % 20 == 0)
+				|| (static_cast<int>(Obs_Right) % 20 == 0 && static_cast<int>(Player_Left) % 20 == 10) )
+			{
+				this->addX = -10.0f;
+			}
+			if (Player_Left + this->player1.Move_Speed == Obs_Right || Player_Right - this->player1.Move_Speed == Obs_Left)
+			{
+				this->addX = 0.0f;
+				/*
+				if the current position of x-axis player, if it is in the right of the player then subtract it by Move_speed
+				and vice versa to the left. 
+				if it is equal to Obs_right or obs_left then addX = 0.0f;
+				*/
+			}
+			return false; // not yet finished
 		}
 	}
 
 	// Check for intersection using the bounds
-	return false;
+	return true;
 }
  bool Game::isCollisionY()
  {
@@ -119,9 +147,6 @@ void Game::pollEvents()
 		 if ((Player_Bot  > Obs_Top) && (Player_Top < Obs_Bot)
 			 && (Player_Right >= Obs_Left && Player_Left <= Obs_Right))
 		 {
-			 std::cout << count << " na obstacle\n";
-			 std::cout << "Obs Top: " << Obs_Top << ", Obs Top % 20: " << static_cast<int>(Obs_Top) % 20 << 
-				 ", Player Bot % 20: " << static_cast<int>(Player_Bot) % 20 << "\n";
 			 /*
 			 this if and else if statement is to add 10 or -10 position in y axis of the player. 
 			 example: the player bot is at 440 and the head of the obstacle is 450, the player will not exceed 440
@@ -146,7 +171,10 @@ void Game::pollEvents()
 			 {
 				 this->addY = -10.0f;
 			 }
-			 std::cout << "Add y : " << this->addY << "\n";
+			 if (Player_Top + this->player1.Move_Speed == Obs_Bot || Player_Bot - this->player1.Move_Speed == Obs_Top)
+			 {
+				 this->addX = 0.0f;
+			 }
 			 return false; // not yet finished
 		 }
 		 count++;

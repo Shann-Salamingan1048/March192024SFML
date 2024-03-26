@@ -20,6 +20,7 @@ private:
 	bool isCollisionX();
 	bool isCollisionY();
 	float addY;
+	float addX;
 public:
 	Game();
 	~Game();
