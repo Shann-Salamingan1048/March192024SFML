@@ -57,6 +57,7 @@ void Game::pollEvents()
 			}
 			this->addY = 0.0f;
 			this->addX = 0.0f;
+			// maybe doing an if statement "this->player1.PlayerMovement = 0.0f; " might improve
 			//this->player1.movePlayer(this->player1.PlayerMovement);
 			this->player1.movePlayer(this->player1.PlayerMovement);
 			std::cout << "Collision Y: " << !isCollisionY() << "\nCollision X: " << !isCollisionX() << "\n";
@@ -173,7 +174,8 @@ void Game::pollEvents()
 			 }
 			 if (Player_Top + this->player1.Move_Speed == Obs_Bot || Player_Bot - this->player1.Move_Speed == Obs_Top)
 			 {
-				 this->addX = 0.0f;
+				 this->addX = 0.0f; 
+				 // maybe doing "this->player1.PlayerMovement.y = 0.0f; might improve
 			 }
 			 return false; // not yet finished
 		 }
