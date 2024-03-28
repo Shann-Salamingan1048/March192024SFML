@@ -13,7 +13,8 @@ void Obstacle::initObstacles()
 	{
 		this->Obstacles.push_back(this->ObstacleShape);
 		// Set the position of the obstacle
-		this->Obstacles[i].setPosition((i + 2) * this->Obstacles[i].getSize().x, (i + 2) * this->Obstacles[i].getSize().y); // x, y
+		this->Obstacles[i].setPosition( ((i + 2) * this->Obstacles[i].getSize().x), 
+			((i + 2) * this->Obstacles[i].getSize().y)); // x, y
 	}
 }
 Obstacle ::Obstacle()
