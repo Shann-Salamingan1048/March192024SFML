@@ -62,8 +62,8 @@ void Game::pollEvents()
 			this->player1.movePlayer(this->player1.PlayerMovement);
 			// || (!isCollisionX() && this->player1.PlayerMovement.x != 0)
 			// (!isCollisionY() && this->player1.PlayerMovement.y != 0) 
-			if ((!isCollisionY() && this->player1.PlayerMovement.y != 0) || 
-				(!isCollisionX() && this->player1.PlayerMovement.x != 0))
+			if ((!isCollisionY()) || 
+				(!isCollisionX()))
 			{
 				//std::cout << "Add Y : " << this->addY << ", Add X : " << this->addX << "\n";
 				CurrPos.y += this->addY;
@@ -84,52 +84,56 @@ void Game::pollEvents()
 }
  bool Game::isCollisionX() 
 {
-	 int count = 1;
-	//sf::FloatRect PlayerBounds = this->player1.getGlobBound();
-	sf::Vector2f PlayerPositions = this->player1.getPos();
-	float Player_Left = PlayerPositions.x;
-	sf::Vector2f PlayerSizes = this->player1.getSize();
-	float Player_Right = PlayerPositions.x + PlayerSizes.x;
-	float Player_Top = PlayerPositions.y;
-	float Player_Bot = PlayerPositions.y + PlayerSizes.y;
-	for (const sf::RectangleShape& oneObs : this->obstacle.Obstacles) 
-	{
-		sf::Vector2f ObstaclePos = this->obstacle.getPos(oneObs);
-		sf::Vector2f ObstacleSizes = this->obstacle.getSize(oneObs);
-		float Obs_Left = ObstaclePos.x;
-		float Obs_Right = ObstaclePos.x + ObstacleSizes.x;
-		float Obs_Top = ObstaclePos.y;
-		float Obs_Bot = ObstaclePos.y + ObstacleSizes.y;
-		
-		//sf::FloatRect obstacleBounds = obstacle.getGlobBound(oneObs);
-		if ((Player_Right > Obs_Left) && (Player_Left < Obs_Right)
-			&& (Player_Bot > Obs_Top && Player_Top < Obs_Bot))
+	if(this->player1.PlayerMovement.x != 0) // this wont run unless if it triggered or moved the playermovement.x
+		// to make it efficient or not waste performance per calling this function
+	{ 
+		 int count = 1;
+		//sf::FloatRect PlayerBounds = this->player1.getGlobBound();
+		sf::Vector2f PlayerPositions = this->player1.getPos();
+		float Player_Left = PlayerPositions.x;
+		sf::Vector2f PlayerSizes = this->player1.getSize();
+		float Player_Right = PlayerPositions.x + PlayerSizes.x;
+		float Player_Top = PlayerPositions.y;
+		float Player_Bot = PlayerPositions.y + PlayerSizes.y;
+		for (const sf::RectangleShape& oneObs : this->obstacle.Obstacles)
 		{
-			std::cout << "Count Obs: " << count << "\n";
-			if ((static_cast<int>(Obs_Left) % 20 == 10 && static_cast<int>(Player_Right) % 20 == 0)
-				|| (static_cast<int>(Obs_Left) % 20 == 0 && static_cast<int>(Player_Right) % 20 == 10))
-			{
+			sf::Vector2f ObstaclePos = this->obstacle.getPos(oneObs);
+			sf::Vector2f ObstacleSizes = this->obstacle.getSize(oneObs);
+			float Obs_Left = ObstaclePos.x;
+			float Obs_Right = ObstaclePos.x + ObstacleSizes.x;
+			float Obs_Top = ObstaclePos.y;
+			float Obs_Bot = ObstaclePos.y + ObstacleSizes.y;
 
-				this->addX = this->player1.Move_Speed / 2;
-			}
-			else if ((static_cast<int>(Obs_Right) % 20 == 10 && static_cast<int>(Player_Left) % 20 == 0)
-				|| (static_cast<int>(Obs_Right) % 20 == 0 && static_cast<int>(Player_Left) % 20 == 10) )
+			//sf::FloatRect obstacleBounds = obstacle.getGlobBound(oneObs);
+			if ((Player_Right > Obs_Left) && (Player_Left < Obs_Right)
+				&& (Player_Bot > Obs_Top && Player_Top < Obs_Bot))
 			{
-				this->addX = -(this->player1.Move_Speed / 2);
+				std::cout << "Count Obs: " << count << "\n";
+				if ((static_cast<int>(Obs_Left) % 20 == 10 && static_cast<int>(Player_Right) % 20 == 0)
+					|| (static_cast<int>(Obs_Left) % 20 == 0 && static_cast<int>(Player_Right) % 20 == 10))
+				{
+
+					this->addX = this->player1.Move_Speed / 2;
+				}
+				else if ((static_cast<int>(Obs_Right) % 20 == 10 && static_cast<int>(Player_Left) % 20 == 0)
+					|| (static_cast<int>(Obs_Right) % 20 == 0 && static_cast<int>(Player_Left) % 20 == 10))
+				{
+					this->addX = -(this->player1.Move_Speed / 2);
+				}
+				if (Player_Left + this->player1.Move_Speed == Obs_Right ||
+					(Player_Right - this->player1.Move_Speed == Obs_Left))
+				{
+					this->addX = 0.0f;
+					/*
+					if the current position of x-axis player, if it is in the right of the player then subtract it by Move_speed
+					and vice versa to the left.
+					if it is equal to Obs_right or obs_left then addX = 0.0f;
+					*/
+				}
+				return false; // not yet finished
 			}
-			if (Player_Left + this->player1.Move_Speed == Obs_Right || 
-				(Player_Right - this->player1.Move_Speed == Obs_Left ))
-			{
-				this->addX = 0.0f;
-				/*
-				if the current position of x-axis player, if it is in the right of the player then subtract it by Move_speed
-				and vice versa to the left. 
-				if it is equal to Obs_right or obs_left then addX = 0.0f;
-				*/
-			}
-			return false; // not yet finished
+			count++;
 		}
-		count++;
 	}
 
 	// Check for intersection using the bounds
@@ -137,62 +141,65 @@ void Game::pollEvents()
 }
  bool Game::isCollisionY()
  {
-	 //sf::FloatRect PlayerBounds = this->player1.getGlobBound();
-	 sf::Vector2f PlayerPositions = this->player1.getPos();
-	 float Player_Left = PlayerPositions.x;
-	 sf::Vector2f PlayerSizes = this->player1.getSize();
-	 float Player_Right = PlayerPositions.x + PlayerSizes.x;
-	 float Player_Top = PlayerPositions.y;
-	 float Player_Bot = PlayerPositions.y + PlayerSizes.y;
-	 //std::cout << "Player Top: " << Player_Top << ", Player Bot: " << Player_Bot << "Player Left: " << Player_Left 
-		 //<< ", Player Right: " << Player_Right << "\n";
-	 for (const sf::RectangleShape& oneObs : this->obstacle.Obstacles)
+	 if (this->player1.PlayerMovement.y != 0)  // this wont run unless if it triggered or moved the playermovement.y
+		 // to make it efficient or not waste performance per calling this function
 	 {
-		 sf::Vector2f ObstaclePos = this->obstacle.getPos(oneObs);
-		 sf::Vector2f ObstacleSizes = this->obstacle.getSize(oneObs);
-		 float Obs_Left = ObstaclePos.x;
-		 float Obs_Right = ObstaclePos.x + ObstacleSizes.x;
-		 float Obs_Top = ObstaclePos.y;
-		 float Obs_Bot = ObstaclePos.y + ObstacleSizes.y;
-		 //sf::FloatRect obstacleBounds = obstacle.getGlobBound(oneObs);
-		 if ( (Player_Bot  > Obs_Top) && (Player_Top < Obs_Bot)
-			 && (Player_Right > Obs_Left && Player_Left < Obs_Right))
+		 //sf::FloatRect PlayerBounds = this->player1.getGlobBound();
+		 sf::Vector2f PlayerPositions = this->player1.getPos();
+		 float Player_Left = PlayerPositions.x;
+		 sf::Vector2f PlayerSizes = this->player1.getSize();
+		 float Player_Right = PlayerPositions.x + PlayerSizes.x;
+		 float Player_Top = PlayerPositions.y;
+		 float Player_Bot = PlayerPositions.y + PlayerSizes.y;
+		 //std::cout << "Player Top: " << Player_Top << ", Player Bot: " << Player_Bot << "Player Left: " << Player_Left 
+			 //<< ", Player Right: " << Player_Right << "\n";
+		 for (const sf::RectangleShape& oneObs : this->obstacle.Obstacles)
 		 {
-			 
-			 std::cout << "Obs Left: " << Obs_Left << ", Obs Right: " << Obs_Right << "\n";
-			 /*
-			 this if and else if statement is to add 10 or -10 position in y axis of the player. 
-			 example: the player bot is at 440 and the head of the obstacle is 450, the player will not exceed 440
-			 but in this if and else if function it will go 450 and it will not exceed 450, so that it is properly
-			 bump by the logic just like in real life bump in the concrete wall.
-			 this is vice versa to the obstacle bot and player top
-			 |
-			 v <- player bot
-			 --- <- bump (Obstacle head or top )
-			 
-			 ______   <- bump (obstacle bot)
-			 ^ <- player top
-			 |
-			 */
-			 if ((static_cast<int>(Obs_Top) % 20 == 10 && static_cast<int>(Player_Bot) % 20 == 0)
-				 || (static_cast<int>(Obs_Top) % 20 == 0 && static_cast<int>(Player_Bot) % 20 == 10))
+			 sf::Vector2f ObstaclePos = this->obstacle.getPos(oneObs);
+			 sf::Vector2f ObstacleSizes = this->obstacle.getSize(oneObs);
+			 float Obs_Left = ObstaclePos.x;
+			 float Obs_Right = ObstaclePos.x + ObstacleSizes.x;
+			 float Obs_Top = ObstaclePos.y;
+			 float Obs_Bot = ObstaclePos.y + ObstacleSizes.y;
+			 //sf::FloatRect obstacleBounds = obstacle.getGlobBound(oneObs);
+			 if ((Player_Bot > Obs_Top) && (Player_Top < Obs_Bot)
+				 && (Player_Right > Obs_Left && Player_Left < Obs_Right))
 			 {
-				 this->addY = this->player1.Move_Speed / 2;
+
+				 std::cout << "Obs Left: " << Obs_Left << ", Obs Right: " << Obs_Right << "\n";
+				 /*
+				 this if and else if statement is to add 10 or -10 position in y axis of the player.
+				 example: the player bot is at 440 and the head of the obstacle is 450, the player will not exceed 440
+				 but in this if and else if function it will go 450 and it will not exceed 450, so that it is properly
+				 bump by the logic just like in real life bump in the concrete wall.
+				 this is vice versa to the obstacle bot and player top
+				 |
+				 v <- player bot
+				 --- <- bump (Obstacle head or top )
+
+				 ______   <- bump (obstacle bot)
+				 ^ <- player top
+				 |
+				 */
+				 if ((static_cast<int>(Obs_Top) % 20 == 10 && static_cast<int>(Player_Bot) % 20 == 0)
+					 || (static_cast<int>(Obs_Top) % 20 == 0 && static_cast<int>(Player_Bot) % 20 == 10))
+				 {
+					 this->addY = this->player1.Move_Speed / 2;
+				 }
+				 else if ((static_cast<int>(Obs_Bot) % 20 == 10 && static_cast<int>(Player_Top) % 20 == 0)
+					 || (static_cast<int>(Obs_Bot) % 20 == 0 && static_cast<int>(Player_Top) % 20 == 10))
+				 {
+					 this->addY = -(this->player1.Move_Speed / 2);
+				 }
+				 if (Player_Top + this->player1.Move_Speed == Obs_Bot || Player_Bot - this->player1.Move_Speed == Obs_Top)
+				 {
+					 this->addX = 0.0f;
+					 // maybe doing "this->player1.PlayerMovement.y = 0.0f; might improve
+				 }
+				 return false; // not yet finished
 			 }
-			 else if ((static_cast<int>(Obs_Bot) % 20 == 10 && static_cast<int>(Player_Top) % 20 == 0)
-				 || (static_cast<int>(Obs_Bot) % 20 == 0 && static_cast<int>(Player_Top) % 20 == 10))
-			 {
-				 this->addY = -(this->player1.Move_Speed / 2);
-			 }
-			 if (Player_Top + this->player1.Move_Speed == Obs_Bot || Player_Bot - this->player1.Move_Speed == Obs_Top)
-			 {
-				 this->addX = 0.0f;
-				 // maybe doing "this->player1.PlayerMovement.y = 0.0f; might improve
-			 }
-			 return false; // not yet finished
 		 }
 	 }
-
 	 // Check for intersection using the bounds
 	 return true;
  }
